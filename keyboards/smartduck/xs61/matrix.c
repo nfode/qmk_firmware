@@ -190,16 +190,16 @@ OSAL_IRQ_HANDLER(SN32_CT16B1_HANDLER) {
     // Turn the selected row off
     writePinLow(led_row_pins[current_row]);
 
-    // Set all column pins input high
-    for (uint8_t col_index = 0; col_index < MATRIX_COLS; col_index++) {
-        setPinInputHigh(col_pins[col_index]);
-    }
-
     // Turn the next row on
     current_row = (current_row + 1) % LED_MATRIX_ROWS_HW;
 
     if(current_row == 0)
     {
+        // Set all column pins input high
+        for (uint8_t col_index = 0; col_index < MATRIX_COLS; col_index++) {
+            setPinInputHigh(col_pins[col_index]);
+        }
+
         // Read the key matrix
         for (uint8_t row_index = 0; row_index < MATRIX_ROWS; row_index++) {
             // Enable the row
