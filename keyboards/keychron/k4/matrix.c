@@ -42,7 +42,7 @@ matrix_row_t matrix[MATRIX_ROWS]; //debounced values
 
 static uint8_t current_led_row =0;
 
-extern volatile LED_TYPE led_state[DRIVER_LED_TOTAL];
+extern volatile LED_TYPE led_state[LED_MATRIX_ROWS * LED_MATRIX_COLS];
 
 __attribute__((weak)) void matrix_init_kb(void) { matrix_init_user(); }
 
