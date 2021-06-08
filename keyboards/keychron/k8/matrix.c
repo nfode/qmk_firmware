@@ -46,7 +46,7 @@ matrix_row_t matrix[MATRIX_ROWS];     //debounced values
 
 static uint8_t current_led_row = 0;
 
-extern volatile LED_TYPE led_state[DRIVER_LED_TOTAL];
+extern volatile LED_TYPE led_state[LED_MATRIX_ROWS * LED_MATRIX_COLS];
 
 void sn32_wait_x10us(uint32_t n) {
     n *= 21;
