@@ -339,7 +339,7 @@ OSAL_IRQ_HANDLER(SN32_CT16B1_HANDLER) {
         SN_CT16B1->MR13 = led_state[row_ofst + 13].r;
         SN_CT16B1->MR14 = led_state[row_ofst + 14].r;
         SN_CT16B1->MR16 = led_state[row_ofst + 15].r;
-        SN_CT16B1->MR17 = led_state[row_ofst + 15].r;
+        SN_CT16B1->MR17 = led_state[row_ofst + 16].r;
     }
 
     if(current_row % 3 == 1)
@@ -360,7 +360,7 @@ OSAL_IRQ_HANDLER(SN32_CT16B1_HANDLER) {
         SN_CT16B1->MR13 = led_state[row_ofst + 13].b;
         SN_CT16B1->MR14 = led_state[row_ofst + 14].b;
         SN_CT16B1->MR16 = led_state[row_ofst + 15].b;
-        SN_CT16B1->MR17 = led_state[row_ofst + 15].b;
+        SN_CT16B1->MR17 = led_state[row_ofst + 16].b;
     }
 
     if(current_row % 3 == 2)
@@ -381,7 +381,7 @@ OSAL_IRQ_HANDLER(SN32_CT16B1_HANDLER) {
         SN_CT16B1->MR13 = led_state[row_ofst + 13].g;
         SN_CT16B1->MR14 = led_state[row_ofst + 14].g;
         SN_CT16B1->MR16 = led_state[row_ofst + 15].g;
-        SN_CT16B1->MR17 = led_state[row_ofst + 15].g;
+        SN_CT16B1->MR17 = led_state[row_ofst + 16].g;
     }
 
     if(SN_CT16B1->MR0 > 0)
