@@ -25,8 +25,8 @@
 #define DEVICE_VER             0x0001
 
 #define MANUFACTURER    Womier
-#define PRODUCT         k87
-#define DESCRIPTION     k87
+#define PRODUCT         K87
+#define DESCRIPTION     K87
 
 /* key matrix size */
 #define MATRIX_ROWS 6
