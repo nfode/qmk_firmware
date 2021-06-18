@@ -45,7 +45,7 @@ static bool matrix_changed = false;
 // static uint8_t led_index = 0;
 static uint8_t current_row = 0;
 
-extern volatile LED_TYPE led_state[DRIVER_LED_TOTAL];
+extern volatile LED_TYPE led_state[LED_MATRIX_ROWS * LED_MATRIX_COLS];
 
 __attribute__((weak)) void matrix_init_kb(void) { matrix_init_user(); }
 
