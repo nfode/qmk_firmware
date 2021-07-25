@@ -188,7 +188,6 @@ uint8_t matrix_scan(void) {
     return matrix_changed;
 }
 
-uint8_t hw_row_to_matrix_row[18] = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5 };
 /**
  * @brief   CT16B1 interrupt handler.
  *
@@ -234,7 +233,7 @@ OSAL_IRQ_HANDLER(SN32_CT16B1_HANDLER) {
             }
         }
 
-        uint8_t row_idx = hw_row_to_matrix_row[current_row];
+        uint8_t row_idx = ( current_row / 3 );
         uint16_t row_ofst = row_ofsts[row_idx];
 
         //Set CT16B1 as the up-counting mode.
