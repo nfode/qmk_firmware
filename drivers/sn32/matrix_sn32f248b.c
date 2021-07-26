@@ -61,12 +61,21 @@ inline matrix_row_t matrix_get_row(uint8_t row) { return matrix[row]; }
 void matrix_print(void) {}
 
 static void init_pins(void) {
-
+#ifdef SN32_MATRIX_READ_ROWS
     //  Unselect ROWs
     for (uint8_t x = 0; x < MATRIX_ROWS; x++) {
         setPinInput(row_pins[x]);
         writePinHigh(row_pins[x]);
     }
+#endif
+
+#ifdef SN32_MATRIX_READ_COLS
+    //  Unselect ROWs
+    for (uint8_t x = 0; x < MATRIX_ROWS; x++) {
+        setPinOutput(row_pins[x]);
+        writePinHigh(row_pins[x]);
+    }
+#endif
 
     // Unselect COLs
     for (uint8_t x = 0; x < MATRIX_COLS; x++) {
@@ -274,6 +283,7 @@ OSAL_IRQ_HANDLER(SN32_CT16B1_HANDLER) {
     // Turn the next row on
     current_row = (current_row + 1) % LED_MATRIX_ROWS_HW;
 
+#ifdef SN32_MATRIX_READ_ROWS
     if(current_row == 0)
     {
         // Read the key matrix
@@ -296,6 +306,37 @@ OSAL_IRQ_HANDLER(SN32_CT16B1_HANDLER) {
             writePinHigh(col_pins[col_index]);
         }
     }
+#endif
+
+#ifdef SN32_MATRIX_READ_COLS
+    if(current_row == 0)
+    {
+        // Set all column pins input high
+        for (uint8_t col_index = 0; col_index < MATRIX_COLS; col_index++) {
+            setPinInputHigh(col_pins[col_index]);
+        }
+
+        // Read the key matrix
+        for (uint8_t row_index = 0; row_index < MATRIX_ROWS; row_index++) {
+            // Enable the row
+            writePinLow(row_pins[row_index]);
+
+            for (uint8_t col_index = 0; col_index < MATRIX_COLS; col_index++) {
+                // Check row pin state
+                if (readPin(col_pins[col_index]) == 0) {
+                    // Pin LO, set col bit
+                    raw_matrix[row_index] |= (MATRIX_ROW_SHIFTER << col_index);
+                } else {
+                    // Pin HI, clear col bit
+                    raw_matrix[row_index] &= ~(MATRIX_ROW_SHIFTER << col_index);
+                }
+            }
+
+            // Disable the row
+            writePinHigh(row_pins[row_index]);
+        }
+    }
+#endif
 
     uint8_t row_idx = ( current_row / 3 );
     uint16_t row_ofst = row_ofsts[row_idx];
