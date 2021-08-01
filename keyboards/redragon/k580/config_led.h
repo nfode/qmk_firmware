@@ -32,8 +32,3 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define UNDERGLOW_IDX { 13, 112, 114, 115, 116, 117, 118, 17, 18, 19, 20, 79, 100, 98 }
 
 #define DRIVER_LED_TOTAL 118
-
-#define LED_NUM_LOCK_PIN B13
-#define LED_CAPS_LOCK_PIN B14
-#define LED_SCROLL_LOCK_PIN B15
-#define LED_PIN_ON_STATE 0
