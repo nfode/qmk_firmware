@@ -33,6 +33,7 @@
 #define MATRIX_ROWS 5
 #define MATRIX_COLS 16
 
+#define SN32_MATRIX_READ_COLS
 #define DIODE_DIRECTION COL2ROW
 #define MATRIX_COL_PINS { A8, A9, A10, A11, A12, A13, A14, A15, B0, B1, B2, B3, B4, B5, B6, B7 }
 #define MATRIX_ROW_PINS { D11, D10, D9, D8, D7 }
@@ -41,5 +42,7 @@
 #define DIP_SWITCH_PINS { D5, D6 }
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
-#define DEBOUNCE 10
+#define DEBOUNCE 20
 #define TAPPING_TERM 200
+#define ONESHOT_TAP_TOGGLE 5  /* Tapping this number of times holds the key until tapped once again. */
+#define ONESHOT_TIMEOUT 5000  /* Time (in ms) before the one shot key is released */
