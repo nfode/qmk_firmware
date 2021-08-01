@@ -1,5 +1,5 @@
 # project specific files
-SRC += matrix.c
+SRC = ../../../drivers/sn32/matrix_sn32f248b.c
 SRC += led_matrix.c
 SRC += config_led.c
 
