@@ -1,4 +1,5 @@
-"keyboard_name": "RK61 Mechanical keyboard",
+{
+    "keyboard_name": "RK61 Mechanical keyboard",
     "url": "http://www.rkgaming.com/en-US/article.php?id=54",
     "maintainer": "qmk",
     "width": 14,
@@ -66,7 +67,7 @@
                 {"label":"Alt", "x":10, "y":4, "w":1.25},
                 {"label":"Menu", "x":11.25, "y":4, "w":1.25},
                 {"label":"Ctrl", "x":12.5, "y":4, "w":1.25},
-                {"label":"FN", "x":13.75, "y":4},
+                {"label":"FN", "x":13.75, "y":4}
             ]
         }
     }
