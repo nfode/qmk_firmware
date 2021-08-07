@@ -41,5 +41,9 @@
 // Connects each switch in the dip switch to the GPIO pin of the MCU
 #define DIP_SWITCH_PINS { D5, D6 }
 
+/* LED Status indicators */
+#define LED_CAPS_LOCK_PIN B9
+#define LED_PIN_ON_STATE  1
+
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
 #define DEBOUNCE 10
