@@ -44,4 +44,8 @@
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
 #define DEBOUNCE 0
 
+/* LED Status indicators */
+#define LED_CAPS_LOCK_PIN B9
+#define LED_PIN_ON_STATE  1
+
 #include "config_led.h"

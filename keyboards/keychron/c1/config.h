@@ -44,6 +44,10 @@
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
 #define DEBOUNCE 0
 
-//#define FORCE_NKRO
+/* LED Status indicators */
+#define LED_CAPS_LOCK_PIN B10
+#define LED_SCROLL_LOCK_PIN B11 //labled Mac on KB since no Scroll Lock
+#define LED_NUM_LOCK_PIN B12 //labled Windows on KB since no Numpad
+#define LED_PIN_ON_STATE  1
 
 #include "config_led.h"

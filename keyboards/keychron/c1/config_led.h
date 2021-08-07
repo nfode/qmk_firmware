@@ -19,8 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 // Backlight configuration
-
-//#define BACKLIGHT_LEVELS 17
+#define BACKLIGHT_LEVELS 8
 
 #define LED_MATRIX_ROWS 6
 #define LED_MATRIX_ROW_CHANNELS 3
@@ -31,14 +30,3 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define LED_MATRIX_COL_PINS { A8, A9, A10, A11, A12, A13, A14, A15, B0, B1, B2, B3, B4, B5, B6, B7, B8 }
 
 #define DRIVER_LED_TOTAL (87)
-
-#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 255
-#define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_SOLID_COLOR
-#define RGB_MATRIX_STARTUP_HUE 127
-#define RGB_MATRIX_STARTUP_SAT 255
-#define RGB_MATRIX_STARTUP_VAL RGB_MATRIX_MAXIMUM_BRIGHTNESS
-#define RGB_MATRIX_STARTUP_SPD 0
-#define RGB_MATRIX_LED_FLUSH_LIMIT 32
-#define LED_CAPS_LOCK_PIN B10
-#define LED_SCROLL_LOCK_PIN B11 //labled Mac on KB since no Scroll Lock
-#define LED_NUM_LOCK_PIN B12 //labled Windows on KB since no Numpad
