@@ -27,7 +27,7 @@
 
 #define MANUFACTURER    Keychron
 #define PRODUCT         K6
-#define DESCRIPTION     K6RGB
+#define DESCRIPTION     K6 RGB ANSI
 
 /* key matrix size */
 #define MATRIX_ROWS 5
