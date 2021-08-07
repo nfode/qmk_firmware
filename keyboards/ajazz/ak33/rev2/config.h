@@ -46,4 +46,7 @@
 /* Locking resynchronize hack */
 //#define LOCKING_RESYNC_ENABLE
 
+#define LED_CAPS_LOCK_PIN   B14
+#define LED_PIN_ON_STATE    0
+
 #include "config_led.h"
