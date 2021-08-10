@@ -43,6 +43,4 @@
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
 #define DEBOUNCE 5
 
-#define SN32_MATRIX_READ_COLS
-
 #include "config_led.h"
