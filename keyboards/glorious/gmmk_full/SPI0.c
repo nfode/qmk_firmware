@@ -57,7 +57,10 @@ void SPI0_Init(void)
     while ((SN_SYS0->CSST & 0x1) != 0x1);
     SN_SYS0->CLKCFG = 0x0;
     while ((SN_SYS0->CLKCFG & 0x70) != 0x0);
-    SN_SYS0->AHBCP_b.AHBPRE = 1;
+    SN_SYS0->AHBCP_b.AHBPRE = 0;
+
+    // compensate tick load value for 12MHz -> 48MHz (4x timer load value)
+    SysTick->LOAD = ((SysTick->LOAD + 1) << 2) - 1;
 #endif    
     
 	//Enable HCLK for SSP0
