@@ -28,6 +28,9 @@
 
 #define I2C_DELAY
 
+static uint8_t sel_frame[2] = {0, 0};
+static uint8_t sel_frame_idx = 0;
+
 void i2c_init(void)
 {    
     // SN_GPIO0->MODE = SN_GPIO0->MODE | (1 << 20) | (1 << 21);
@@ -241,11 +244,15 @@ static void set_pwm(uint8_t dev, uint8_t addr, uint8_t value)
 {
     /* >=0x80 for farme 2 otherwise frame 1 */
     if (addr >= 0x80) {
-        i2c_write_reg(dev, 0xFD, 1);
+        if(sel_frame[sel_frame_idx] == 0) {
+            i2c_write_reg(dev, 0xFD, 1);
+            sel_frame[sel_frame_idx] = 1;
+        }
         addr -= 0x80;
     }
-    else {
+    else if(sel_frame[sel_frame_idx] == 1) {
         i2c_write_reg(dev, 0xFD, 0);
+        sel_frame[sel_frame_idx] = 0;
     }
 
     i2c_write_reg(dev, addr + 0x20, value);
@@ -256,10 +263,14 @@ void _set_color(int index, uint8_t r, uint8_t g, uint8_t b)
     uint8_t dev;
     int l = g_led_pos[index];
 
-    if (g_led_chip[index])
+    if (g_led_chip[index]) {
         dev = 0xEE;
-    else
+        sel_frame_idx = 1;
+    }
+    else {
         dev = 0xE8;
+        sel_frame_idx = 0;
+    }
 
     set_pwm(dev, l, r);
     set_pwm(dev, l + 0x10, g);
