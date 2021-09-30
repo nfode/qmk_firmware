@@ -1,7 +1,5 @@
 #include QMK_KEYBOARD_H
 
-#include "raw_hid.h"
-
 #define _BL 0
 #define _FN 1
 

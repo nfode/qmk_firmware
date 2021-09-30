@@ -4,7 +4,6 @@
 #include <SN32F260.h>
 #include "ch.h"
 #include "hal.h"
-
 #include "color.h"
 #include "wait.h"
 #include "util.h"
@@ -124,8 +123,6 @@ void _read_color(int index, uint8_t *r, uint8_t *g, uint8_t *b)
     spi_r3(1, y * 48 + a + 4*8, g); // g  
 }
 
-
-
 void reset_rgb(int pin)
 {
     spi_set_cspin(pin);
@@ -168,13 +165,12 @@ void process_backlight(uint8_t devid, volatile LED_TYPE* states)
     {
         case 0: /* init RGB chips */
             spi_init();
-            
+
             writePinHigh(SDB);
-            setPinOutput(SDB);            
-            
-            reset_rgb(B1);                        
+            setPinOutput(SDB);
+            reset_rgb(B1);
             reset_rgb(B2);
-            
+
             state = 1;
             break;
     }
