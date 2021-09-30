@@ -26,7 +26,7 @@
 #define I2C_SDA_LO do { setPinOutput(I2C_SDA); writePinLow(I2C_SDA); } while (0)
 #define I2C_SDA_HIZ setPinInputHigh(I2C_SDA)
 
-#define I2C_DELAY   for (int32_t i = 0; i < 4; i++);
+#define I2C_DELAY
 
 void i2c_init(void)
 {    
