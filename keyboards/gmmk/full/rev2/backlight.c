@@ -28,7 +28,7 @@
 
 #define I2C_DELAY
 
-static uint8_t sel_frame[2] = {0, 0};
+static uint8_t sel_frame[2] = {0xFF, 0xFF};
 static uint8_t sel_frame_idx = 0;
 
 void i2c_init(void)
@@ -216,6 +216,38 @@ static void reset_rgb(int devid)
     i2c_write_reg(devid, 0x0A, 1);
 }
 
+#ifdef KEYMAP_ISO
+ 
+/* ISO */
+
+/*
+ * led index to RGB address
+ */
+static const uint8_t g_led_pos[DRIVER_LED_TOTAL] = {
+/* 0*/ 0xC0,0xC1,0xC2,0xC3,0xC4,0xC5,0xC6,0xC7,0xC8,0xC9,0xCA,0xC0,0xC1,0xC2,0xC3,0xC4,
+/*16*/ 0x90,0x91,0x92,0x93,0x94,0x95,0x96,0x97,0x98,0x9C,0x9D,0x9E,0x9F,0xCA,0x90,0x91,0x92,0x93,0x94,0x95,0x96,
+/*37*/ 0x60,0x61,0x62,0x63,0x64,0x65,0x69,0x6A,0x6B,0x6C,0x6D,0x6E,0x6F,0x97,0x98,0x60,0x61,0x62,0x63,0x64,0x65,
+/*58*/ 0x30,0x31,0x32,0x36,0x37,0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F,0x30,0x31,0x32,
+/*74*/ 0x03,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,0x36,0x37,0x38,0x39,0x3A,
+/*91*/ 0x03,0x04,0x05,0x07,0x09,0x0A,0x0B,0x0D,0x0E,0x0F,0x3B,0x3C,0x3D,0x04/* KC_NUBS */
+};
+
+/*
+ * led index to chip selection table (0: E8, 1: EE)
+ */
+static const uint8_t g_led_chip[DRIVER_LED_TOTAL] = {
+/* 0*/    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   0,   0,   0,   0,   0,
+/*16*/    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   0,   0,   0,   0,   0,   0,   0,   0,
+/*37*/    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   0,   0,   0,   0,   0,   0,   0,   0,
+/*58*/    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   0,   0,   0,
+/*74*/    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   0,   0,   0,   0,   0,
+/*91*/    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   1/* KC_NUBS */
+};
+
+#else
+
+/* ANSI */
+
 /*
  * led index to RGB address
  */
@@ -236,21 +268,23 @@ static const uint8_t g_led_chip[DRIVER_LED_TOTAL] = {
 /*16*/    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,  0,    0,   0,   0,   0,   0,   0,   0,
 /*37*/    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,  0,    0,   0,   0,   0,   0,   0,   0,
 /*58*/    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,  0,    0,   0,
-/*74*/    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   0,  0,    0,   0,
+/*74*/    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   0,  0,    0,   0,   0,
 /*91*/    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
 };
 
+#endif
+
 static void set_pwm(uint8_t dev, uint8_t addr, uint8_t value)
 {
-    /* >=0x80 for farme 2 otherwise frame 1 */
+    /* >=0x80 for frame 2 otherwise frame 1 */
     if (addr >= 0x80) {
-        if(sel_frame[sel_frame_idx] == 0) {
+        if (sel_frame[sel_frame_idx] != 1) {
             i2c_write_reg(dev, 0xFD, 1);
             sel_frame[sel_frame_idx] = 1;
         }
         addr -= 0x80;
     }
-    else if(sel_frame[sel_frame_idx] == 1) {
+    else if (sel_frame[sel_frame_idx] != 0) {
         i2c_write_reg(dev, 0xFD, 0);
         sel_frame[sel_frame_idx] = 0;
     }
