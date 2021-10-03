@@ -55,6 +55,3 @@
 #define RGB_DISABLE_WHEN_USB_SUSPENDED true
 /* change the g_led_config global to const for RAM saving */
 #define RGB_MATRIX_CONST_LED_CONFIG
-
-/* use unbuffered direct mode in OpenRGB protocol */
-#define OPENRGB_DIRECT_MODE_UNBUFFERED
