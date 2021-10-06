@@ -60,6 +60,15 @@ inline matrix_row_t matrix_get_row(uint8_t row) { return matrix[row]; }
 
 void matrix_print(void) {}
 
+#if defined(OPTICAL_MATRIX)
+void delay(void){
+    for (int i = 0; i < 400; ++i) {
+        __asm__ volatile("" ::: "memory");
+    }
+
+}
+#endif
+
 static void init_pins(void) {
 #if(DIODE_DIRECTION == ROW2COL)
     //  Unselect ROWs
@@ -115,7 +124,7 @@ void matrix_init(void) {
     SN_PFPA->CT16B1 = 0x00000000;
 
     pwm_en_msk = 0;
-    
+
     // Enable PWM function, IOs and select the PWM modes for the LED column pins
     for(uint8_t i = 0; i < LED_MATRIX_COLS; i++) {
         switch(led_col_pins[i]) {
@@ -133,7 +142,7 @@ void matrix_init(void) {
                 pwm_en_msk |= mskCT16_PWM1EN_EN;
                 mr_offset[1] = i;
                 break;
-            
+
             case B10:
                 SN_PFPA->CT16B1 |= mskCT16_PWM2EN_EN;
             case A2:
@@ -403,10 +412,17 @@ OSAL_IRQ_HANDLER(SN32_CT16B1_HANDLER) {
         for (uint8_t row_index = 0; row_index < MATRIX_ROWS; row_index++) {
             // Enable the row
             writePinLow(row_pins[row_index]);
+#if defined(OPTICAL_MATRIX)
+            delay();
+#endif
 
             for (uint8_t col_index = 0; col_index < MATRIX_COLS; col_index++) {
                 // Check row pin state
+#if defined(OPTICAL_MATRIX)
+                if (readPin(col_pins[col_index]) == 1) {
+#else
                 if (readPin(col_pins[col_index]) == 0) {
+#endif
                     // Pin LO, set col bit
                     raw_matrix[row_index] |= (MATRIX_ROW_SHIFTER << col_index);
                 } else {
