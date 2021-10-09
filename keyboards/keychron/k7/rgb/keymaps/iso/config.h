@@ -31,7 +31,7 @@
 
 /* key matrix size */
 #define MATRIX_ROWS 5
-#define MATRIX_COLS 16
+#define MATRIX_COLS 15
 
 #define DIODE_DIRECTION COL2ROW
 

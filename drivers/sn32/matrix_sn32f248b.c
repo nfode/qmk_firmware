@@ -434,6 +434,11 @@ OSAL_IRQ_HANDLER(SN32_CT16B1_HANDLER) {
             // Disable the row
             writePinHigh(row_pins[row_index]);
         }
+
+        // Set all column pins input low to activate leds
+        for (uint8_t col_index = 0; col_index < MATRIX_COLS; col_index++) {
+            setPinInputLow(col_pins[col_index]);
+        }
     }
 #endif
 
