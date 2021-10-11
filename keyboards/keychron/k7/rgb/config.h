@@ -27,7 +27,7 @@
 
 #define MANUFACTURER    Keychron
 #define PRODUCT         K7
-#define DESCRIPTION     K7 RGB ANSI
+#define DESCRIPTION     K7RGB
 
 /* key matrix size */
 #define MATRIX_ROWS 5
@@ -39,7 +39,7 @@
 #define MATRIX_ROW_PINS { D11, D10, D9, D8, D7 }
 
 // Connects each switch in the dip switch to the GPIO pin of the MCU
-#define DIP_SWITCH_PINS { D5, D6 }
+//#define DIP_SWITCH_PINS { D5, D6 }
 
 /* LED Status indicators */
 #define LED_CAPS_LOCK_PIN B9
@@ -47,3 +47,5 @@
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
 #define DEBOUNCE 5
+
+#define FORCE_NKRO

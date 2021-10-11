@@ -1,50 +1,19 @@
-/* Copyright 2020 Adam Honse <calcprogrammer1@gmail.com>
- * Copyright 2020 Dimitris Mantzouranis <d3xter93@gmail.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+//#define RGB_MATRIX_ENABLE 1
+//#define RGB_MATRIX_KEYPRESSES
+//#define RGB_MATRIX_LED_PROCESS_LIMIT 0
+//#define RGB_MATRIX_LED_FLUSH_LIMIT 0 // limits in milliseconds how frequently an animation will update the LEDs. 16 (16ms) is equivalent to limiting to 60fps (increases keyboard responsiveness)
+//#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 255 // limits maximum brightness of LEDs to 200 out of 255. If not defined maximum brightness is set to 255
+#define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_SOLID_COLOR
+#define RGB_MATRIX_STARTUP_HUE 127 // Sets the default hue value, if none has been set
+#define RGB_MATRIX_STARTUP_SAT 0 // Sets the default saturation value, if none has been set
+#define RGB_MATRIX_STARTUP_VAL 255 // Sets the default brightness value, if none has been set
+#define RGB_MATRIX_STARTUP_SPD 63
+#define RGB_MATRIX_SPD_STEP 16
 
-#pragma once
+#define SLEEP_LED_MODE_ANIMATION RGB_MATRIX_BREATHING
 
-#include "config_common.h"
-#include "config_led.h"
 
-/* USB Device descriptor parameter */
-#define VENDOR_ID       0x0C45
-#define PRODUCT_ID      0x5004
-#define DEVICE_VER      0x0001
 
-#define MANUFACTURER    Keychron
-#define PRODUCT         K7
-#define DESCRIPTION     K7RGB
-
-/* key matrix size */
-#define MATRIX_ROWS 5
-#define MATRIX_COLS 15
-
-#define DIODE_DIRECTION COL2ROW
-
-#define MATRIX_COL_PINS { A8, A9, A10, A11, A12, A13, A14, A15, B0, B1, B2, B3, B4, B5, B6 }
-#define MATRIX_ROW_PINS { D11, D10, D9, D8, D7 }
-
-// Connects each switch in the dip switch to the GPIO pin of the MCU
-#define DIP_SWITCH_PINS { D5, D6 }
-
-/* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
-#define DEBOUNCE 5
 #define TAPPING_TERM 200
 #define ONESHOT_TAP_TOGGLE 5  /* Tapping this number of times holds the key until tapped once again. */
 #define ONESHOT_TIMEOUT 5000  /* Time (in ms) before the one shot key is released */
-
-#define FORCE_NKRO
