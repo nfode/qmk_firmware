@@ -53,3 +53,5 @@
 #include "config_led.h"
 
 #define RGB_DISABLE_WHEN_USB_SUSPENDED true
+
+#define LAYER_STATE_8BIT
