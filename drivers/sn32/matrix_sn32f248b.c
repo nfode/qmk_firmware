@@ -89,7 +89,7 @@ static void init_pins(void) {
 
 /* PWM configuration structure. We use timer CT16B1 with 24 channels. */
 static PWMConfig pwmcfg = {
-    0xFFFF,        /* PWM clock frequency. */
+    4000000,       /* PWM clock frequency. */
     256,           /* PWM period (in ticks) 1S (1/10kHz=0.1mS 0.1ms*10000 ticks=1S) */
     NULL,          /* RGB Callback */
     {              /* Default all channels to disabled - Channels will be configured durring init */
