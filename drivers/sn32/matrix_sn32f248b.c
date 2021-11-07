@@ -357,7 +357,7 @@ void rgb_callback(PWMDriver *pwmp) {
 
     // Disable PWM outputs on column pins
     for(uint8_t i=0;i<24;i++){
-        pwm_lld_disable_channel(&PWMD1,i);
+        pwmDisableChannelI(pwmp,i);
     }
     // Turn the selected row off
     writePinLow(led_row_pins[current_row]);
@@ -426,21 +426,21 @@ void rgb_callback(PWMDriver *pwmp) {
     if(current_row % 3 == 0)
     {
         for(uint8_t i=0; i<24; i++){
-            pwmEnableChannel(&PWMD1,i,led_state[row_ofst + mr_offset[i] ].r);
+            pwmEnableChannelI(pwmp,i,led_state[row_ofst + mr_offset[i] ].r);
         }
     }
 
     if(current_row % 3 == 1)
     {
         for(uint8_t i=0; i<24; i++){
-            pwmEnableChannel(&PWMD1,i,led_state[row_ofst + mr_offset[i] ].b);
+            pwmEnableChannelI(pwmp,i,led_state[row_ofst + mr_offset[i] ].b);
         }
     }
 
     if(current_row % 3 == 2)
     {
         for(uint8_t i=0; i<24; i++){
-            pwmEnableChannel(&PWMD1,i,led_state[row_ofst + mr_offset[i] ].g);
+            pwmEnableChannelI(pwmp,i,led_state[row_ofst + mr_offset[i] ].g);
         }
     }
 
