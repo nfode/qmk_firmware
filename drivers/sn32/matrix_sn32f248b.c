@@ -36,14 +36,24 @@ static const pin_t row_pins[MATRIX_ROWS] = MATRIX_ROW_PINS;
 static const pin_t col_pins[MATRIX_COLS] = MATRIX_COL_PINS;
 static const pin_t led_row_pins[LED_MATRIX_ROWS_HW] = LED_MATRIX_ROW_PINS;
 static const pin_t led_col_pins[LED_MATRIX_COLS] = LED_MATRIX_COL_PINS;
-#if defined(OPTICAL_MATRIX)
-//skipping some matrix scans will increase led brightness for optical matrix due to delays in the scan
-//500 gives noticeable flickering. should not set above 250
-static const uint8_t SKIP_SCANS = 30;
-#else
-static const uint8_t SKIP_SCANS = 0;
-#endif
+
+//some matrix cutomizations to accomodate optical matrix as well as experiment with existing mech matrix
+#if defined(SKIP_THIS_NOF_MATRIX_SCANS)
+//skipping some matrix scans will increase led brightness for a matrix due to delays in the scan
+//500 gives noticeable flickering. should not be set above 250
 static uint8_t scan_count = 0;
+#endif
+
+#if !defined(PRESSED_KEY_PIN_STATE)
+#define PRESSED_KEY_PIN_STATE 0
+#endif
+
+#if defined(SCAN_ON_EXTRA_ROW)
+#define SCAN_ROW LED_MATRIX_ROWS_HW
+#else
+#define SCAN_ROW 0
+#endif
+
 static uint16_t row_ofsts[LED_MATRIX_ROWS];
 static uint8_t mr_offset[24] = {0};
 static uint32_t pwm_en_msk = 0;
@@ -68,7 +78,7 @@ inline matrix_row_t matrix_get_row(uint8_t row) { return matrix[row]; }
 
 void matrix_print(void) {}
 
-#if defined(OPTICAL_MATRIX)
+#if defined(DELAY_ENABLE)
 //should give 1000/12000000Mhz = 83us delay
 void delay(void){
     for (int i = 0; i < 1000; ++i) {
@@ -380,26 +390,38 @@ OSAL_IRQ_HANDLER(SN32_CT16B1_HANDLER) {
 
     SN_CT16B1->IC = mskCT16_MR24IC; // Clear match interrupt status
 
-    // Turn row off
+    // Turn the selected row off
+    #if defined(SCAN_ON_EXTRA_ROW)
     if (current_row < LED_MATRIX_ROWS_HW){
-       writePinLow(led_row_pins[current_row]);
+        writePinLow(led_row_pins[current_row]);
     }
     //get the next row. extra row (+1) is used for matrix scan
     current_row = (current_row + 1) % (LED_MATRIX_ROWS_HW + 1);
-    scan_count = scan_count + 1;
+    #else
+    writePinLow(led_row_pins[current_row]);
+
+    // Turn the next row on
+    current_row = (current_row + 1) % LED_MATRIX_ROWS_HW;
+    #endif
 
 #if(DIODE_DIRECTION == ROW2COL)
-    if((current_row == (LED_MATRIX_ROWS_HW + 0)) && (scan_count > SKIP_SCANS))
+    if(current_row == SCAN_ROW)
     {
+        #if defined(SKIP_THIS_NOF_MATRIX_SCANS)
+        if (scan_count >= SKIP_THIS_NOF_MATRIX_SCANS) {
         scan_count = 0;
+        #endif
         // Read the key matrix
         for (uint8_t col_index = 0; col_index < MATRIX_COLS; col_index++) {
             // Enable the column
             writePinLow(col_pins[col_index]);
+            #if defined(DELAY_ENABLE)
+            delay();
+            #endif
 
             for (uint8_t row_index = 0; row_index < MATRIX_ROWS; row_index++) {
                 // Check row pin state
-                if (readPin(row_pins[row_index]) == 0) {
+                if (readPin(row_pins[row_index]) == PRESSED_KEY_PIN_STATE) {
                     // Pin LO, set col bit
                     raw_matrix[row_index] |= (MATRIX_ROW_SHIFTER << col_index);
                 } else {
@@ -411,33 +433,38 @@ OSAL_IRQ_HANDLER(SN32_CT16B1_HANDLER) {
             // Disable the column
             writePinHigh(col_pins[col_index]);
         }
+        #if defined(SKIP_THIS_NOF_MATRIX_SCANS)
+        }
+        else{
+            scan_count = scan_count + 1;
+        }
+        #endif
     }
 #elif(DIODE_DIRECTION == COL2ROW)
-    if((current_row == (LED_MATRIX_ROWS_HW + 0)) && (scan_count > SKIP_SCANS))
+    if(current_row == SCAN_ROW)
     {
+        #if defined(SKIP_THIS_NOF_MATRIX_SCANS)
+        if (scan_count >= SKIP_THIS_NOF_MATRIX_SCANS) {
         scan_count = 0;
+        #endif
         // Set all column pins input high
         for (uint8_t col_index = 0; col_index < MATRIX_COLS; col_index++) {
             setPinInputHigh(col_pins[col_index]);
         }
-#if defined(OPTICAL_MATRIX)
-            delay();
-#endif
+        #if defined(DELAY_ENABLE)
+        delay();
+        #endif
         // Read the key matrix
         for (uint8_t row_index = 0; row_index < MATRIX_ROWS; row_index++) {
             // Enable the row
             writePinLow(row_pins[row_index]);
-#if defined(OPTICAL_MATRIX)
+            #if defined(DELAY_ENABLE)
             delay();
-#endif
+            #endif
 
             for (uint8_t col_index = 0; col_index < MATRIX_COLS; col_index++) {
                 // Check row pin state
-#if defined(OPTICAL_MATRIX)
-                if (readPin(col_pins[col_index]) == 1) {
-#else
-                if (readPin(col_pins[col_index]) == 0) {
-#endif
+                if (readPin(col_pins[col_index]) == PRESSED_KEY_PIN_STATE) {
                     // Pin LO, set col bit
                     raw_matrix[row_index] |= (MATRIX_ROW_SHIFTER << col_index);
                 } else {
@@ -454,11 +481,20 @@ OSAL_IRQ_HANDLER(SN32_CT16B1_HANDLER) {
         for (uint8_t col_index = 0; col_index < MATRIX_COLS; col_index++) {
             setPinInputLow(col_pins[col_index]);
         }
-#if defined(OPTICAL_MATRIX)
-            delay();
-#endif
+        #if defined(DELAY_ENABLE)
+        delay();
+        #endif
+        #if defined(SKIP_THIS_NOF_MATRIX_SCANS)
+        }
+        else{
+            scan_count = scan_count + 1;
+        }
+        #endif
     }
 #endif
+
+    uint8_t row_idx = ( current_row / 3 );
+    uint16_t row_ofst = row_ofsts[row_idx];
 
     //Set CT16B1 as the up-counting mode.
     SN_CT16B1->TMRCTRL = (mskCT16_CRST);
@@ -466,197 +502,197 @@ OSAL_IRQ_HANDLER(SN32_CT16B1_HANDLER) {
     // Wait until timer reset done.
     while (SN_CT16B1->TMRCTRL & mskCT16_CRST);
 
-    if (current_row < LED_MATRIX_ROWS_HW) {
-        uint8_t row_idx = ( current_row / 3 );
-        uint16_t row_ofst = row_ofsts[row_idx];
-
-        if(current_row % 3 == 0)
-        {
-            SN_CT16B1->MR0  = led_state[row_ofst + mr_offset[0] ].r;
-            SN_CT16B1->MR1  = led_state[row_ofst + mr_offset[1] ].r;
-            SN_CT16B1->MR2  = led_state[row_ofst + mr_offset[2] ].r;
-            SN_CT16B1->MR3  = led_state[row_ofst + mr_offset[3] ].r;
-            SN_CT16B1->MR4  = led_state[row_ofst + mr_offset[4] ].r;
-            SN_CT16B1->MR5  = led_state[row_ofst + mr_offset[5] ].r;
-            SN_CT16B1->MR6  = led_state[row_ofst + mr_offset[6] ].r;
-            SN_CT16B1->MR7  = led_state[row_ofst + mr_offset[7] ].r;
-            SN_CT16B1->MR8  = led_state[row_ofst + mr_offset[8] ].r;
-            SN_CT16B1->MR9  = led_state[row_ofst + mr_offset[9] ].r;
-            SN_CT16B1->MR10 = led_state[row_ofst + mr_offset[10]].r;
-            SN_CT16B1->MR11 = led_state[row_ofst + mr_offset[11]].r;
-            SN_CT16B1->MR12 = led_state[row_ofst + mr_offset[12]].r;
-            SN_CT16B1->MR13 = led_state[row_ofst + mr_offset[13]].r;
-            SN_CT16B1->MR14 = led_state[row_ofst + mr_offset[14]].r;
-            SN_CT16B1->MR15 = led_state[row_ofst + mr_offset[15]].r;
-            SN_CT16B1->MR16 = led_state[row_ofst + mr_offset[16]].r;
-            SN_CT16B1->MR17 = led_state[row_ofst + mr_offset[17]].r;
-            SN_CT16B1->MR18 = led_state[row_ofst + mr_offset[18]].r;
-            SN_CT16B1->MR19 = led_state[row_ofst + mr_offset[19]].r;
-            SN_CT16B1->MR20 = led_state[row_ofst + mr_offset[20]].r;
-            SN_CT16B1->MR21 = led_state[row_ofst + mr_offset[21]].r;
-            SN_CT16B1->MR22 = led_state[row_ofst + mr_offset[22]].r;
-            SN_CT16B1->MR23 = led_state[row_ofst + mr_offset[23]].r;
-        }
-
-        if(current_row % 3 == 1)
-        {
-            SN_CT16B1->MR0  = led_state[row_ofst + mr_offset[0] ].b;
-            SN_CT16B1->MR1  = led_state[row_ofst + mr_offset[1] ].b;
-            SN_CT16B1->MR2  = led_state[row_ofst + mr_offset[2] ].b;
-            SN_CT16B1->MR3  = led_state[row_ofst + mr_offset[3] ].b;
-            SN_CT16B1->MR4  = led_state[row_ofst + mr_offset[4] ].b;
-            SN_CT16B1->MR5  = led_state[row_ofst + mr_offset[5] ].b;
-            SN_CT16B1->MR6  = led_state[row_ofst + mr_offset[6] ].b;
-            SN_CT16B1->MR7  = led_state[row_ofst + mr_offset[7] ].b;
-            SN_CT16B1->MR8  = led_state[row_ofst + mr_offset[8] ].b;
-            SN_CT16B1->MR9  = led_state[row_ofst + mr_offset[9] ].b;
-            SN_CT16B1->MR10 = led_state[row_ofst + mr_offset[10]].b;
-            SN_CT16B1->MR11 = led_state[row_ofst + mr_offset[11]].b;
-            SN_CT16B1->MR12 = led_state[row_ofst + mr_offset[12]].b;
-            SN_CT16B1->MR13 = led_state[row_ofst + mr_offset[13]].b;
-            SN_CT16B1->MR14 = led_state[row_ofst + mr_offset[14]].b;
-            SN_CT16B1->MR15 = led_state[row_ofst + mr_offset[15]].b;
-            SN_CT16B1->MR16 = led_state[row_ofst + mr_offset[16]].b;
-            SN_CT16B1->MR17 = led_state[row_ofst + mr_offset[17]].b;
-            SN_CT16B1->MR18 = led_state[row_ofst + mr_offset[18]].b;
-            SN_CT16B1->MR19 = led_state[row_ofst + mr_offset[19]].b;
-            SN_CT16B1->MR20 = led_state[row_ofst + mr_offset[20]].b;
-            SN_CT16B1->MR21 = led_state[row_ofst + mr_offset[21]].b;
-            SN_CT16B1->MR22 = led_state[row_ofst + mr_offset[22]].b;
-            SN_CT16B1->MR23 = led_state[row_ofst + mr_offset[23]].b;
-        }
-
-        if(current_row % 3 == 2)
-        {
-            SN_CT16B1->MR0  = led_state[row_ofst + mr_offset[0] ].g;
-            SN_CT16B1->MR1  = led_state[row_ofst + mr_offset[1] ].g;
-            SN_CT16B1->MR2  = led_state[row_ofst + mr_offset[2] ].g;
-            SN_CT16B1->MR3  = led_state[row_ofst + mr_offset[3] ].g;
-            SN_CT16B1->MR4  = led_state[row_ofst + mr_offset[4] ].g;
-            SN_CT16B1->MR5  = led_state[row_ofst + mr_offset[5] ].g;
-            SN_CT16B1->MR6  = led_state[row_ofst + mr_offset[6] ].g;
-            SN_CT16B1->MR7  = led_state[row_ofst + mr_offset[7] ].g;
-            SN_CT16B1->MR8  = led_state[row_ofst + mr_offset[8] ].g;
-            SN_CT16B1->MR9  = led_state[row_ofst + mr_offset[9] ].g;
-            SN_CT16B1->MR10 = led_state[row_ofst + mr_offset[10]].g;
-            SN_CT16B1->MR11 = led_state[row_ofst + mr_offset[11]].g;
-            SN_CT16B1->MR12 = led_state[row_ofst + mr_offset[12]].g;
-            SN_CT16B1->MR13 = led_state[row_ofst + mr_offset[13]].g;
-            SN_CT16B1->MR14 = led_state[row_ofst + mr_offset[14]].g;
-            SN_CT16B1->MR15 = led_state[row_ofst + mr_offset[15]].g;
-            SN_CT16B1->MR16 = led_state[row_ofst + mr_offset[16]].g;
-            SN_CT16B1->MR17 = led_state[row_ofst + mr_offset[17]].g;
-            SN_CT16B1->MR18 = led_state[row_ofst + mr_offset[18]].g;
-            SN_CT16B1->MR19 = led_state[row_ofst + mr_offset[19]].g;
-            SN_CT16B1->MR20 = led_state[row_ofst + mr_offset[20]].g;
-            SN_CT16B1->MR21 = led_state[row_ofst + mr_offset[21]].g;
-            SN_CT16B1->MR22 = led_state[row_ofst + mr_offset[22]].g;
-            SN_CT16B1->MR23 = led_state[row_ofst + mr_offset[23]].g;
-        }
-
-        uint32_t new_pwm_en = 0;
-        if(SN_CT16B1->MR0 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM0EN_EN;
-        }
-        if(SN_CT16B1->MR1 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM1EN_EN;
-        }
-        if(SN_CT16B1->MR2 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM2EN_EN;
-        }
-        if(SN_CT16B1->MR3 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM3EN_EN;
-        }
-        if(SN_CT16B1->MR4 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM4EN_EN;
-        }
-        if(SN_CT16B1->MR5 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM5EN_EN;
-        }
-        if(SN_CT16B1->MR6 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM6EN_EN;
-        }
-        if(SN_CT16B1->MR7 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM7EN_EN;
-        }
-        if(SN_CT16B1->MR8 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM8EN_EN;
-        }
-        if(SN_CT16B1->MR9 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM9EN_EN;
-        }
-        if(SN_CT16B1->MR10 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM10EN_EN;
-        }
-        if(SN_CT16B1->MR11 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM11EN_EN;
-        }
-        if(SN_CT16B1->MR12 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM12EN_EN;
-        }
-        if(SN_CT16B1->MR13 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM13EN_EN;
-        }
-        if(SN_CT16B1->MR14 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM14EN_EN;
-        }
-        if(SN_CT16B1->MR15 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM15EN_EN;
-        }
-        if(SN_CT16B1->MR16 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM16EN_EN;
-        }
-        if(SN_CT16B1->MR17 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM17EN_EN;
-        }
-        if(SN_CT16B1->MR18 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM18EN_EN;
-        }
-        if(SN_CT16B1->MR19 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM19EN_EN;
-        }
-        if(SN_CT16B1->MR20 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM20EN_EN;
-        }
-        if(SN_CT16B1->MR21 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM21EN_EN;
-        }
-        if(SN_CT16B1->MR22 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM22EN_EN;
-        }
-        if(SN_CT16B1->MR23 > 0)
-        {
-            new_pwm_en |= mskCT16_PWM23EN_EN;
-        }
-
-        SN_CT16B1->PWMIOENB = pwm_en_msk & new_pwm_en;
-
-        // Turn the new row on
-        writePinHigh(led_row_pins[current_row]);
+    #if defined(SCAN_ON_EXTRA_ROW)
+    if (current_row < LED_MATRIX_ROWS_HW){
+    #endif
+    if(current_row % 3 == 0)
+    {
+        SN_CT16B1->MR0  = led_state[row_ofst + mr_offset[0] ].r;
+        SN_CT16B1->MR1  = led_state[row_ofst + mr_offset[1] ].r;
+        SN_CT16B1->MR2  = led_state[row_ofst + mr_offset[2] ].r;
+        SN_CT16B1->MR3  = led_state[row_ofst + mr_offset[3] ].r;
+        SN_CT16B1->MR4  = led_state[row_ofst + mr_offset[4] ].r;
+        SN_CT16B1->MR5  = led_state[row_ofst + mr_offset[5] ].r;
+        SN_CT16B1->MR6  = led_state[row_ofst + mr_offset[6] ].r;
+        SN_CT16B1->MR7  = led_state[row_ofst + mr_offset[7] ].r;
+        SN_CT16B1->MR8  = led_state[row_ofst + mr_offset[8] ].r;
+        SN_CT16B1->MR9  = led_state[row_ofst + mr_offset[9] ].r;
+        SN_CT16B1->MR10 = led_state[row_ofst + mr_offset[10]].r;
+        SN_CT16B1->MR11 = led_state[row_ofst + mr_offset[11]].r;
+        SN_CT16B1->MR12 = led_state[row_ofst + mr_offset[12]].r;
+        SN_CT16B1->MR13 = led_state[row_ofst + mr_offset[13]].r;
+        SN_CT16B1->MR14 = led_state[row_ofst + mr_offset[14]].r;
+        SN_CT16B1->MR15 = led_state[row_ofst + mr_offset[15]].r;
+        SN_CT16B1->MR16 = led_state[row_ofst + mr_offset[16]].r;
+        SN_CT16B1->MR17 = led_state[row_ofst + mr_offset[17]].r;
+        SN_CT16B1->MR18 = led_state[row_ofst + mr_offset[18]].r;
+        SN_CT16B1->MR19 = led_state[row_ofst + mr_offset[19]].r;
+        SN_CT16B1->MR20 = led_state[row_ofst + mr_offset[20]].r;
+        SN_CT16B1->MR21 = led_state[row_ofst + mr_offset[21]].r;
+        SN_CT16B1->MR22 = led_state[row_ofst + mr_offset[22]].r;
+        SN_CT16B1->MR23 = led_state[row_ofst + mr_offset[23]].r;
     }
+
+    if(current_row % 3 == 1)
+    {
+        SN_CT16B1->MR0  = led_state[row_ofst + mr_offset[0] ].b;
+        SN_CT16B1->MR1  = led_state[row_ofst + mr_offset[1] ].b;
+        SN_CT16B1->MR2  = led_state[row_ofst + mr_offset[2] ].b;
+        SN_CT16B1->MR3  = led_state[row_ofst + mr_offset[3] ].b;
+        SN_CT16B1->MR4  = led_state[row_ofst + mr_offset[4] ].b;
+        SN_CT16B1->MR5  = led_state[row_ofst + mr_offset[5] ].b;
+        SN_CT16B1->MR6  = led_state[row_ofst + mr_offset[6] ].b;
+        SN_CT16B1->MR7  = led_state[row_ofst + mr_offset[7] ].b;
+        SN_CT16B1->MR8  = led_state[row_ofst + mr_offset[8] ].b;
+        SN_CT16B1->MR9  = led_state[row_ofst + mr_offset[9] ].b;
+        SN_CT16B1->MR10 = led_state[row_ofst + mr_offset[10]].b;
+        SN_CT16B1->MR11 = led_state[row_ofst + mr_offset[11]].b;
+        SN_CT16B1->MR12 = led_state[row_ofst + mr_offset[12]].b;
+        SN_CT16B1->MR13 = led_state[row_ofst + mr_offset[13]].b;
+        SN_CT16B1->MR14 = led_state[row_ofst + mr_offset[14]].b;
+        SN_CT16B1->MR15 = led_state[row_ofst + mr_offset[15]].b;
+        SN_CT16B1->MR16 = led_state[row_ofst + mr_offset[16]].b;
+        SN_CT16B1->MR17 = led_state[row_ofst + mr_offset[17]].b;
+        SN_CT16B1->MR18 = led_state[row_ofst + mr_offset[18]].b;
+        SN_CT16B1->MR19 = led_state[row_ofst + mr_offset[19]].b;
+        SN_CT16B1->MR20 = led_state[row_ofst + mr_offset[20]].b;
+        SN_CT16B1->MR21 = led_state[row_ofst + mr_offset[21]].b;
+        SN_CT16B1->MR22 = led_state[row_ofst + mr_offset[22]].b;
+        SN_CT16B1->MR23 = led_state[row_ofst + mr_offset[23]].b;
+    }
+
+    if(current_row % 3 == 2)
+    {
+        SN_CT16B1->MR0  = led_state[row_ofst + mr_offset[0] ].g;
+        SN_CT16B1->MR1  = led_state[row_ofst + mr_offset[1] ].g;
+        SN_CT16B1->MR2  = led_state[row_ofst + mr_offset[2] ].g;
+        SN_CT16B1->MR3  = led_state[row_ofst + mr_offset[3] ].g;
+        SN_CT16B1->MR4  = led_state[row_ofst + mr_offset[4] ].g;
+        SN_CT16B1->MR5  = led_state[row_ofst + mr_offset[5] ].g;
+        SN_CT16B1->MR6  = led_state[row_ofst + mr_offset[6] ].g;
+        SN_CT16B1->MR7  = led_state[row_ofst + mr_offset[7] ].g;
+        SN_CT16B1->MR8  = led_state[row_ofst + mr_offset[8] ].g;
+        SN_CT16B1->MR9  = led_state[row_ofst + mr_offset[9] ].g;
+        SN_CT16B1->MR10 = led_state[row_ofst + mr_offset[10]].g;
+        SN_CT16B1->MR11 = led_state[row_ofst + mr_offset[11]].g;
+        SN_CT16B1->MR12 = led_state[row_ofst + mr_offset[12]].g;
+        SN_CT16B1->MR13 = led_state[row_ofst + mr_offset[13]].g;
+        SN_CT16B1->MR14 = led_state[row_ofst + mr_offset[14]].g;
+        SN_CT16B1->MR15 = led_state[row_ofst + mr_offset[15]].g;
+        SN_CT16B1->MR16 = led_state[row_ofst + mr_offset[16]].g;
+        SN_CT16B1->MR17 = led_state[row_ofst + mr_offset[17]].g;
+        SN_CT16B1->MR18 = led_state[row_ofst + mr_offset[18]].g;
+        SN_CT16B1->MR19 = led_state[row_ofst + mr_offset[19]].g;
+        SN_CT16B1->MR20 = led_state[row_ofst + mr_offset[20]].g;
+        SN_CT16B1->MR21 = led_state[row_ofst + mr_offset[21]].g;
+        SN_CT16B1->MR22 = led_state[row_ofst + mr_offset[22]].g;
+        SN_CT16B1->MR23 = led_state[row_ofst + mr_offset[23]].g;
+    }
+
+    uint32_t new_pwm_en = 0;
+    if(SN_CT16B1->MR0 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM0EN_EN;
+    }
+    if(SN_CT16B1->MR1 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM1EN_EN;
+    }
+    if(SN_CT16B1->MR2 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM2EN_EN;
+    }
+    if(SN_CT16B1->MR3 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM3EN_EN;
+    }
+    if(SN_CT16B1->MR4 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM4EN_EN;
+    }
+    if(SN_CT16B1->MR5 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM5EN_EN;
+    }
+    if(SN_CT16B1->MR6 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM6EN_EN;
+    }
+    if(SN_CT16B1->MR7 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM7EN_EN;
+    }
+    if(SN_CT16B1->MR8 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM8EN_EN;
+    }
+    if(SN_CT16B1->MR9 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM9EN_EN;
+    }
+    if(SN_CT16B1->MR10 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM10EN_EN;
+    }
+    if(SN_CT16B1->MR11 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM11EN_EN;
+    }
+    if(SN_CT16B1->MR12 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM12EN_EN;
+    }
+    if(SN_CT16B1->MR13 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM13EN_EN;
+    }
+    if(SN_CT16B1->MR14 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM14EN_EN;
+    }
+    if(SN_CT16B1->MR15 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM15EN_EN;
+    }
+    if(SN_CT16B1->MR16 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM16EN_EN;
+    }
+    if(SN_CT16B1->MR17 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM17EN_EN;
+    }
+    if(SN_CT16B1->MR18 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM18EN_EN;
+    }
+    if(SN_CT16B1->MR19 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM19EN_EN;
+    }
+    if(SN_CT16B1->MR20 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM20EN_EN;
+    }
+    if(SN_CT16B1->MR21 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM21EN_EN;
+    }
+    if(SN_CT16B1->MR22 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM22EN_EN;
+    }
+    if(SN_CT16B1->MR23 > 0)
+    {
+        new_pwm_en |= mskCT16_PWM23EN_EN;
+    }
+
+    SN_CT16B1->PWMIOENB = pwm_en_msk & new_pwm_en;
+
+    writePinHigh(led_row_pins[current_row]);
+    #if defined(SCAN_ON_EXTRA_ROW)
+    }
+    #endif
 
     // Set match interrupts and TC rest
     SN_CT16B1->MCTRL3 = (mskCT16_MR24IE_EN | mskCT16_MR24STOP_EN);

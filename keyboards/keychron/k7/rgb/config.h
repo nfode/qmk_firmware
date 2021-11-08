@@ -46,6 +46,13 @@
 #define LED_PIN_ON_STATE  1
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
-#define DEBOUNCE 5
+#define DEBOUNCE 0
 
 #define FORCE_NKRO
+
+#if defined(OPTICAL_MATRIX)
+#define PRESSED_KEY_PIN_STATE 1
+#define SKIP_THIS_NOF_MATRIX_SCANS 1
+#define DELAY_ENABLE 1
+#define SCAN_ON_EXTRA_ROW 1
+#endif
