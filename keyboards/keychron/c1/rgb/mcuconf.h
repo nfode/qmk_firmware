@@ -36,7 +36,17 @@
 /*
  * HAL driver system settings.
  */
-
+/*
+ * CT driver system settings.
+ */
+#define SN32_HAS_CT16B0 TRUE
+#define SN32_HAS_CT16B1 TRUE
+/*
+ * PWM driver system settings.
+ */
+#define HAL_USE_PWM TRUE
+#define SN32_PWM_USE_CT16B1 TRUE
+#define SN32_PWM_USE_ONESHOT TRUE
 /*
  * SN driver system settings.
  */
