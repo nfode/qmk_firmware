@@ -253,6 +253,23 @@ void rgb_ch_ctrl(PWMConfig *cfg) {
     }
 
 }
+void rgb_callback(PWMDriver *pwmp);
+
+void shared_matrix_rgb_enable(void) {
+    pwmcfg.callback = rgb_callback;
+    pwmEnablePeriodicNotification(&PWMD1);
+}
+
+void shared_matrix_rgb_disable(void) {
+    // Disable PWM outputs on column pins
+    for(uint8_t i=0;i<24;i++){
+        chSysLockFromISR();
+        pwmDisableChannel(&PWMD1,i);
+        chSysUnlockFromISR();
+    }
+    pwmcfg.callback = NULL;
+    pwmDisablePeriodicNotification(&PWMD1);
+}
 
 void rgb_callback(PWMDriver *pwmp) {
 
@@ -310,22 +327,6 @@ void rgb_callback(PWMDriver *pwmp) {
     //Restart with new values
     pwmStart(pwmp, &pwmcfg);
     writePinHigh(led_row_pins[current_row]);
-}
-
-void shared_matrix_rgb_enable(void) {
-    pwmcfg.callback = rgb_callback;
-    pwmEnablePeriodicNotification(&PWMD1);
-}
-
-void shared_matrix_rgb_disable(void) {
-    // Disable PWM outputs on column pins
-    for(uint8_t i=0;i<24;i++){
-        chSysLockFromISR();
-        pwmDisableChannel(&PWMD1,i);
-        chSysUnlockFromISR();
-    }
-    pwmcfg.callback = NULL;
-    pwmDisablePeriodicNotification(&PWMD1);
 }
 
 void SN32F24XX_init(void) {

@@ -6,6 +6,4 @@
 void SN32F24XX_init(void);
 void SN32F24XX_set_color(int index, uint8_t r, uint8_t g, uint8_t b);
 void SN32F24XX_set_color_all(uint8_t r, uint8_t g, uint8_t b);
-void shared_matrix_rgb_enable(void);
-void shared_matrix_rgb_disable(void);
 void matrix_scan_keys(matrix_row_t raw_matrix[], uint8_t current_row);
