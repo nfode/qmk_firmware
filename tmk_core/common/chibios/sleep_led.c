@@ -178,7 +178,7 @@ void sleep_led_disable(void) { gptStopTimer(&SLEEP_LED_GPT_DRIVER); }
 
 void sleep_led_toggle(void) { (SLEEP_LED_GPT_DRIVER.state == GPT_READY) ? sleep_led_enable() : sleep_led_disable(); }
 
-#elif defined(SN32F24xx) && defined(RGB_MATRIX_ENABLE)
+#elif defined(SN32F2xx) && defined(RGB_MATRIX_ENABLE)
 
 //for the purpose of sleep_led implementation RGB_MATRIX_NONE will convey intention to disable matrix.
 #ifndef SLEEP_LED_MODE_ANIMATION
