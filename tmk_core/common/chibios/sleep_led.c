@@ -194,19 +194,19 @@ void sleep_led_enable(void) {
     current_mode = rgb_matrix_get_mode();
     current_state = rgb_matrix_is_enabled();
     if (SLEEP_LED_MODE_ANIMATION == RGB_MATRIX_NONE) {
-        rgb_matrix_disable();
+        rgb_matrix_disable_noeeprom();
     }
     else {
-        rgb_matrix_mode(SLEEP_LED_MODE_ANIMATION);
+        rgb_matrix_mode_noeeprom(SLEEP_LED_MODE_ANIMATION);
     }
 }
 
 void sleep_led_disable(void) {
     if (current_state != rgb_matrix_is_enabled()) {
-        rgb_matrix_enable();
+        rgb_matrix_enable_noeeprom();
     }
     if (current_mode != rgb_matrix_get_mode()) {
-        rgb_matrix_mode(current_mode);
+        rgb_matrix_mode_noeeprom(current_mode);
     }
 }
 
