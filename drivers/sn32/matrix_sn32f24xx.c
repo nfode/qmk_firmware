@@ -55,7 +55,7 @@ static void init_pins(void) {
 #if(DIODE_DIRECTION == ROW2COL)
     //  Unselect ROWs
     for (uint8_t x = 0; x < MATRIX_ROWS; x++) {
-        setPinInput(row_pins[x]);
+        setPinInputHigh(row_pins[x]);
         writePinHigh(row_pins[x]);
     }
 #elif(DIODE_DIRECTION == COL2ROW)
