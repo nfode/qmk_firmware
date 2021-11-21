@@ -85,168 +85,168 @@ void rgb_ch_ctrl(PWMConfig *cfg) {
             case B8:
                 cfg->channels[0].pfpamsk = 1;
             case A0:
-                cfg->channels[0].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[0].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[0] = i;
                 break;
 
             case B9:
                 cfg->channels[1].pfpamsk = 1;
             case A1:
-                cfg->channels[1].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[1].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[1] = i;
                 break;
             
             case B10:
                 cfg->channels[2].pfpamsk = 1;
             case A2:
-                cfg->channels[2].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[2].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[2] = i;
                 break;
 
             case B11:
                 cfg->channels[3].pfpamsk = 1;
             case A3:
-                cfg->channels[3].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[3].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[3] = i;
                 break;
 
             case B12:
                 cfg->channels[4].pfpamsk = 1;
             case A4:
-                cfg->channels[4].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[4].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[4] = i;
                 break;
 
             case B13:
                 cfg->channels[5].pfpamsk = 1;
             case A5:
-                cfg->channels[5].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[5].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[5] = i;
                 break;
 
             case B14:
                 cfg->channels[6].pfpamsk = 1;
             case A6:
-                cfg->channels[6].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[6].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[6] = i;
                 break;
 
             case B15:
                 cfg->channels[7].pfpamsk = 1;
             case A7:
-                cfg->channels[7].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[7].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[7] = i;
                 break;
 
             case C0:
                 cfg->channels[8].pfpamsk = 1;
             case A8:
-                cfg->channels[8].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[8].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[8] = i;
                 break;
 
             case C1:
                 cfg->channels[9].pfpamsk = 1;
             case A9:
-                cfg->channels[9].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[9].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[9] = i;
                 break;
 
             case C2:
                 cfg->channels[10].pfpamsk = 1;
             case A10:
-                cfg->channels[10].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[10].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[10] = i;
                 break;
 
             case C3:
                 cfg->channels[11].pfpamsk = 1;
             case A11:
-                cfg->channels[11].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[11].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[11] = i;
                 break;
 
             case C4:
                 cfg->channels[12].pfpamsk = 1;
             case A12:
-                cfg->channels[12].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[12].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[12] = i;
                 break;
 
             case C5:
                 cfg->channels[13].pfpamsk = 1;
             case A13:
-                cfg->channels[13].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[13].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[13] = i;
                 break;
 
             case C6:
                 cfg->channels[14].pfpamsk = 1;
             case A14:
-                cfg->channels[14].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[14].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[14] = i;
                 break;
 
             case C7:
                 cfg->channels[15].pfpamsk = 1;
             case A15:
-                cfg->channels[15].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[15].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[15] = i;
                 break;
 
             case C8:
                 cfg->channels[16].pfpamsk = 1;
             case B0:
-                cfg->channels[16].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[16].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[16] = i;
                 break;
 
             case C9:
                 cfg->channels[17].pfpamsk = 1;
             case B1:
-                cfg->channels[17].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[17].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[17] = i;
                 break;
 
             case C10:
                 cfg->channels[18].pfpamsk = 1;
             case B2:
-                cfg->channels[18].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[18].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[18] = i;
                 break;
 
             case C11:
                 cfg->channels[19].pfpamsk = 1;
             case B3:
-                cfg->channels[19].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[19].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[19] = i;
                 break;
 
             case C12:
                 cfg->channels[20].pfpamsk = 1;
             case B4:
-                cfg->channels[20].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[20].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[20] = i;
                 break;
 
             case C13:
                 cfg->channels[21].pfpamsk = 1;
             case B5:
-                cfg->channels[21].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[21].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[21] = i;
                 break;
 
             case C14:
                 cfg->channels[22].pfpamsk = 1;
             case B6:
-                cfg->channels[22].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[22].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[22] = i;
                 break;
 
             case C15:
                 cfg->channels[23].pfpamsk = 1;
             case B7:
-                cfg->channels[23].mode = PWM_OUTPUT_ACTIVE_HIGH;
+                cfg->channels[23].mode = PWM_OUTPUT_ACTIVE_LOW;
                 mr_offset[23] = i;
                 break;
         }
