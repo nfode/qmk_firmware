@@ -31,6 +31,10 @@ Ported to QMK by Stephen Peery <https://github.com/smp4488/>
 #include "quantum.h"
 #include "rgb_matrix_sn32f24xx.h"
 
+#ifndef PRESSED_KEY_PIN_STATE
+#    define PRESSED_KEY_PIN_STATE 0
+#endif
+
 static const pin_t row_pins[MATRIX_ROWS] = MATRIX_ROW_PINS;
 static const pin_t col_pins[MATRIX_COLS] = MATRIX_COL_PINS;
 matrix_row_t raw_matrix[MATRIX_ROWS]; //raw values
@@ -118,7 +122,7 @@ void matrix_scan_keys(matrix_row_t raw_matrix[], uint8_t current_row){
                     writePinLow(col_pins[col_index]);
                     for (uint8_t row_index = 0; row_index < MATRIX_ROWS; row_index++) {
                         // Check row pin state
-                        if (readPin(row_pins[row_index]) == 0) {
+                        if (readPin(row_pins[row_index]) == PRESSED_KEY_PIN_STATE) {
                             // Pin LO, set col bit
                             raw_matrix[row_index] |= (MATRIX_ROW_SHIFTER << col_index);
                         } else {
@@ -142,7 +146,7 @@ void matrix_scan_keys(matrix_row_t raw_matrix[], uint8_t current_row){
                     writePinLow(row_pins[row_index]);
                     for (uint8_t col_index = 0; col_index < MATRIX_COLS; col_index++) {
                         // Check row pin state
-                        if (readPin(col_pins[col_index]) == 0) {
+                        if (readPin(col_pins[col_index]) == PRESSED_KEY_PIN_STATE) {
                             // Pin LO, set col bit
                             raw_matrix[row_index] |= (MATRIX_ROW_SHIFTER << col_index);
                         } else {
