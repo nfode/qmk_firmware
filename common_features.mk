@@ -270,7 +270,7 @@ endif
 endif
 
 RGB_MATRIX_ENABLE ?= no
-VALID_RGB_MATRIX_TYPES := AW20216 IS31FL3731 IS31FL3733 IS31FL3737 IS31FL3741 WS2812 custom
+VALID_RGB_MATRIX_TYPES := AW20216 IS31FL3731 IS31FL3733 IS31FL3737 IS31FL3741 WS2812 SN32F248B custom
 
 ifeq ($(strip $(RGB_MATRIX_ENABLE)), yes)
     ifeq ($(filter $(RGB_MATRIX_DRIVER),$(VALID_RGB_MATRIX_TYPES)),)
@@ -288,6 +288,9 @@ endif
     SRC += $(QUANTUM_DIR)/rgb_matrix/rgb_matrix.c
     SRC += $(QUANTUM_DIR)/rgb_matrix/rgb_matrix_drivers.c
     SRC += $(LIB_PATH)/lib8tion/lib8tion.c
+    ifneq ($(strip $(RGB_MATRIX_DRIVER)), SN32F248B)
+        SRC += $(QUANTUM_DIR)/rgb_matrix_drivers.c
+    endif
     CIE1931_CURVE := yes
     RGB_KEYCODES_ENABLE := yes
 
@@ -335,6 +338,11 @@ endif
         OPT_DEFS += -DAPA102
         APA102_DRIVER_REQUIRED := yes
     endif
+
+    ifeq ($(strip $(RGB_MATRIX_DRIVER)), SN32F248B)
+        COMMON_VPATH += $(DRIVER_PATH)/sn32
+        SRC += rgb_matrix_sn32f248b.c
+    endif    
 
     ifeq ($(strip $(RGB_MATRIX_CUSTOM_KB)), yes)
         OPT_DEFS += -DRGB_MATRIX_CUSTOM_KB
