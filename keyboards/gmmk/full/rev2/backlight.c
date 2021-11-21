@@ -31,17 +31,23 @@
  *
  * i2c_delay 1 loop about 7 cycles. Under 48MHz, the actual delay is around 0.9us and 1.5us respectively.
  */
-#define I2C_SCL_HI_DELAY    i2c_delay(5)
-#define I2C_DELAY           i2c_delay(5)
+#define I2C_DELAY           i2c_delay(1)
 
+#ifdef USE_FRAMEBUFFER
+static RGB g_fb[DRIVER_LED_TOTAL];
+#else
 static uint8_t sel_frame[2] = {0xFF, 0xFF};
 static uint8_t sel_frame_idx = 0;
+#endif
 
-static void i2c_delay(uint32_t loop)
+extern uint8_t is_orgb_mode;
+
+static __inline void i2c_delay(uint32_t loop)
 {
-    #pragma GCC unroll 0
+    // #pragma GCC unroll 0
     for (int32_t i = 0; i < loop; i++)
-        SN_WDT->FEED = 0x5AFA55AA;
+        __NOP();
+        // SN_WDT->FEED = 0x5AFA55AA;
 }
 
 void i2c_init(void)
@@ -57,6 +63,9 @@ void i2c_init(void)
     i2c_delay(100);
 }
 
+// #pragma GCC push_options
+// #pragma GCC optimize ("-O2")
+
 static void i2c_process_bit(uint8_t *i2c_tx_byte)
 {
     if (*i2c_tx_byte & 0x80)
@@ -70,68 +79,54 @@ static void i2c_process_bit(uint8_t *i2c_tx_byte)
 
     *i2c_tx_byte = *i2c_tx_byte << 1;
 
-    // I2C_DELAY;
     I2C_SCL_HI;
     I2C_DELAY;
     I2C_SCL_LO;
     I2C_DELAY;
 }
 
-static uint8_t i2c_transaction(uint8_t i2c_addr_rw, uint8_t* i2c_data_ptr, uint8_t i2c_byte_ct)
+static uint8_t i2c_writeb(uint8_t b)
 {
-    uint8_t txb;
-    uint8_t fail = 0;
+	uint8_t fail = 0;
 
-    /* START */
-    I2C_SDA_LO;
-    I2C_DELAY;
-    I2C_SCL_LO;
-    I2C_DELAY;
+    i2c_process_bit(&b);
+    i2c_process_bit(&b);
+    i2c_process_bit(&b);
+    i2c_process_bit(&b);
+    i2c_process_bit(&b);
+    i2c_process_bit(&b);
+    i2c_process_bit(&b);
+    i2c_process_bit(&b);
 
-    txb = i2c_addr_rw;
-    i2c_process_bit(&txb);
-    i2c_process_bit(&txb);
-    i2c_process_bit(&txb);
-    i2c_process_bit(&txb);
-    i2c_process_bit(&txb);
-    i2c_process_bit(&txb);
-    i2c_process_bit(&txb);
-    i2c_process_bit(&txb);
-
-    goto I2C_STATE_READ_ACK;
-
-I2C_STATE_WRITE_BYTE:
-
-    // I2C_SDA_LO;
-    // I2C_SCL_LO;
-
-    txb = *i2c_data_ptr++;
-    i2c_process_bit(&txb);
-    i2c_process_bit(&txb);
-    i2c_process_bit(&txb);
-    i2c_process_bit(&txb);
-    i2c_process_bit(&txb);
-    i2c_process_bit(&txb);
-    i2c_process_bit(&txb);
-    i2c_process_bit(&txb);
-
-    i2c_byte_ct--;
-
-I2C_STATE_READ_ACK:
+/*
+    if (!is_ack)
+        return 0;
+*/
+    /* ack bit */
     setPinInput(I2C_SDA);
     
     I2C_SCL_HI;
     I2C_DELAY;
     
-    /* ignore ACK */
     fail = I2C_SDA_IN;
     
     I2C_SCL_LO;
     I2C_DELAY;
 
-    if (i2c_byte_ct > 0)
-        goto I2C_STATE_WRITE_BYTE;
+    return fail;
+}
 
+static void i2c_start_phase(void)
+{
+    /* START */
+    I2C_SDA_LO;
+    I2C_DELAY;
+    I2C_SCL_LO;
+    I2C_DELAY;
+}
+
+static void i2c_stop_phase(void)
+{
     I2C_SDA_LO;
     I2C_DELAY;
 
@@ -142,8 +137,22 @@ I2C_STATE_READ_ACK:
 
     I2C_DELAY;
     I2C_DELAY;
+}
 
-    return fail;
+// #pragma GCC pop_options
+
+static uint8_t i2c_transaction(uint8_t i2c_addr_rw, uint8_t* i2c_data_ptr, uint8_t i2c_byte_ct)
+{
+    i2c_start_phase();
+
+    i2c_writeb(i2c_addr_rw);
+
+    for (uint8_t i = 0; i < i2c_byte_ct; i++)
+        i2c_writeb(i2c_data_ptr[i]);
+
+    i2c_stop_phase();
+
+    return 0;
 }
 
 static uint8_t i2c_write_buf(uint8_t devid, uint8_t* data, uint8_t len)
@@ -201,6 +210,121 @@ static void reset_rgb(int devid)
     i2c_write_reg(devid, 0x0A, 1);
 }
 
+#ifdef USE_FRAMEBUFFER
+// EE chip
+static const uint8_t led_ee_map[80] = {
+    // page 1
+    255, 255, 255, 74, 104, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85,
+
+    58, 59, 60, 255, 255, 255, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70,
+
+    37, 38, 39, 40, 41, 42, 255, 255, 255, 43, 44, 45, 46, 47, 48, 49,
+
+    // page 2
+    16, 17, 18, 19, 20, 21, 22, 23, 24, 255, 255, 255, 25, 26, 27, 28,
+
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 255, 255, 255, 255, 255
+};
+
+// E8 chip
+static const uint8_t led_e8_map[80] = {
+    // page 1
+    255, 255, 255, 91, 92, 93, 255, 94, 255, 95, 96, 97, 255, 98, 99, 100,
+
+    71, 72, 73, 255, 255, 255, 86, 87, 88, 89, 90, 101, 102, 103, 255, 255,
+
+    52, 53, 54, 55, 56, 57, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+
+    // page 2
+    30, 31, 32, 33, 34, 35, 36, 50, 51, 255, 255, 255, 255, 255, 255, 255,
+
+    11, 12, 13, 14, 15, 255, 255, 255, 255, 255, 29, 255, 255, 255, 255, 255
+};
+
+static void flush_led_fb(uint8_t devid, const uint8_t *map)
+{
+    int32_t led_idx = 0, i, j;
+    uint8_t block[48];
+
+    // page 1
+    i2c_write_reg(devid, 0xFD, 0);
+
+    i2c_start_phase();
+    i2c_writeb(devid);
+    i2c_writeb(0x20);
+
+    for (i = 0; i < 3; i++)
+    {
+        for (j = 0; j < 16; j++)
+        {
+            uint8_t r, g, b;
+            int32_t mi = map[led_idx++];
+
+            if (mi >= DRIVER_LED_TOTAL)
+                r = g = b = 0;
+            else {
+                r = g_fb[mi].r;
+                g = g_fb[mi].g;
+                b = g_fb[mi].b;
+            }
+
+            block[j] = r;
+            block[j + 16] = g;
+            block[j + 32] = b;
+        }
+
+        int32_t block_size;
+
+        if (i <= 1)
+            block_size = 48;
+        else
+            block_size = 32;            
+
+        for (j = 0; j < block_size; j++)
+            i2c_writeb(block[j]);
+    }
+
+    i2c_stop_phase();
+
+    // page 2
+    i2c_write_reg(devid, 0xFD, 1);
+
+    // write the blue channel of last row in page 1
+    i2c_start_phase();
+    i2c_writeb(devid);
+    i2c_writeb(0x20);
+    for (i = 0; i < 16; i++)
+        i2c_writeb(block[32 + i]);
+
+    for (i = 0; i < 2; i++)
+    {
+        for (j = 0; j < 16; j++)
+        {
+            uint8_t r, g, b;
+            int32_t mi = map[led_idx++];
+
+            if (mi >= DRIVER_LED_TOTAL)
+                r = g = b = 0;
+            else {
+                r = g_fb[mi].r;
+                g = g_fb[mi].g;
+                b = g_fb[mi].b;
+            }
+
+            block[j] = r;
+            block[j + 16] = g;
+            block[j + 32] = b;
+        }
+
+        for (j = 0; j < 48; j++)
+            i2c_writeb(block[j]);
+    }
+
+    i2c_stop_phase();
+}
+
+#else
+
 /*
  * led index to RGB address
  */
@@ -249,7 +373,7 @@ static void set_pwm(uint8_t dev, uint8_t addr, uint8_t value)
     i2c_write_reg(dev, addr + 0x20, value);
 }
 
-void _set_color(int index, uint8_t r, uint8_t g, uint8_t b)
+static void _set_color_direct(int index, uint8_t r, uint8_t g, uint8_t b)
 {   
     uint8_t dev;
     int l = g_led_pos[index];
@@ -266,6 +390,24 @@ void _set_color(int index, uint8_t r, uint8_t g, uint8_t b)
     set_pwm(dev, l, r);
     set_pwm(dev, l + 0x10, g);
     set_pwm(dev, l + 0x20, b);
+}
+#endif
+
+void _set_color(int index, uint8_t r, uint8_t g, uint8_t b)
+{
+#ifdef USE_FRAMEBUFFER
+    g_fb[index].r = r;
+    g_fb[index].g = g;
+    g_fb[index].b = b;
+#else
+
+#ifdef VIA_OPENRGB_HYBRID
+    if (!is_orgb_mode && (index == 45 || index == 59 || index == 78))
+        r = g = b = 255;
+#endif
+
+    _set_color_direct(index, r, g, b);
+#endif
 }
 
 void _read_color(int index, uint8_t *r, uint8_t *g, uint8_t *b)
@@ -287,6 +429,22 @@ void process_backlight(uint8_t devid, volatile LED_TYPE *states)
             reset_rgb(0xEE);
 
             state = 1;
+            break;
+
+        case 1:
+        #ifdef USE_FRAMEBUFFER
+            
+        #ifdef VIA_OPENRGB_HYBRID            
+            if (!is_orgb_mode) {
+                rgb_matrix_set_color(78, 255, 255, 255);
+                rgb_matrix_set_color(45, 255, 255, 255);
+                rgb_matrix_set_color(59, 255, 255, 255);                    
+            }
+        #endif
+
+            flush_led_fb(0xEE, led_ee_map);
+            flush_led_fb(0xE8, led_e8_map);
+        #endif
             break;
     }
 }

@@ -25,8 +25,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define LED_MATRIX_COL_PINS MATRIX_COL_PINS
 
+#ifndef VIA_ENABLE
 #ifdef QMK_KEYMAP_H
     #include QMK_KEYMAP_H
+#endif
 #endif
 
 #ifdef KEYMAP_ISO

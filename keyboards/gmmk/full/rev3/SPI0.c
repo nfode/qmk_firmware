@@ -55,7 +55,6 @@ void SPI0_Init(void)
 	SN_SSP0->CTRL0_b.LOOPBACK = SSP_LOOPBACK_DIS;
 	SN_SSP0->CTRL0_b.SDODIS = SSP_SDODIS_EN;
 
-	SN_SSP0->CTRL0_b.TXFIFOTH = 7;
     // SN_SSP0->CLKDIV_b.DIV = 5;   // 48/12 = 4MHz
     SN_SSP0->CLKDIV_b.DIV = 4;      // 48/10 = 4.8 MHz
     
@@ -105,11 +104,21 @@ void SPI0_Write(unsigned char *p, int len)
 {
     for (int i = 0; i < len; i++)
     {
-        // while (!SN_SSP0->STAT_b.TX_EMPTY);
-        while (SN_SSP0->STAT_b.TX_FULL);
+        while (!SN_SSP0->STAT_b.TX_EMPTY);
         SN_SSP0->DATA_b.Data = *p++;
     }
     
+    while (SN_SSP0->STAT_b.BUSY);
+}
+
+void SPI0_Write1(uint8_t data)
+{
+    while (!SN_SSP0->STAT_b.TX_EMPTY);
+    SN_SSP0->DATA_b.Data = data;
+}
+
+void SPI0_Flush(void)
+{
     while (SN_SSP0->STAT_b.BUSY);
 }
 

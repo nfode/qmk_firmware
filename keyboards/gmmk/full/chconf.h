@@ -193,7 +193,7 @@
  * @note    The default is @p TRUE.
  */
 #    if !defined(CH_CFG_USE_WAITEXIT)
-#        define CH_CFG_USE_WAITEXIT TRUE
+#        define CH_CFG_USE_WAITEXIT FALSE
 #    endif
 
 /**
@@ -203,7 +203,7 @@
  * @note    The default is @p TRUE.
  */
 #    if !defined(CH_CFG_USE_SEMAPHORES)
-#        define CH_CFG_USE_SEMAPHORES TRUE
+#        define CH_CFG_USE_SEMAPHORES FALSE
 #    endif
 
 /**
@@ -226,7 +226,7 @@
  * @note    The default is @p TRUE.
  */
 #    if !defined(CH_CFG_USE_MUTEXES)
-#        define CH_CFG_USE_MUTEXES TRUE
+#        define CH_CFG_USE_MUTEXES FALSE
 #    endif
 
 /**
@@ -250,7 +250,7 @@
  * @note    Requires @p CH_CFG_USE_MUTEXES.
  */
 #    if !defined(CH_CFG_USE_CONDVARS)
-#        define CH_CFG_USE_CONDVARS TRUE
+#        define CH_CFG_USE_CONDVARS FALSE
 #    endif
 
 /**
@@ -698,6 +698,13 @@
 #define PORT_INT_REQUIRED_STACK		0
 #define RAW_IN_CAPACITY                 1
 #define RAW_OUT_CAPACITY                1
+
+/* can't call sleep without the idle thread, must override related functions */
+#if CH_CFG_NO_IDLE_THREAD == TRUE
+        #pragma weak chThdSleep
+        #pragma weak chThdSuspendTimeoutS
+#endif
+
 #endif /* CHCONF_H */
 
 /** @} */
