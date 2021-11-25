@@ -15,6 +15,8 @@
  */
 #include "white.h"
 
+#include "quantum.h"
+
 // Manage Windows and Mac LEDs
 // - Show status of mode switch
 // - Turn LEDs off durring USB suspend
@@ -80,6 +82,28 @@ void housekeeping_task_kb(void) {
 
     housekeeping_task_user();
 }
+
+#if CH_CFG_NO_IDLE_THREAD == TRUE
+
+#    define CYCLES_PER_LOOP 9
+#    define LOOP_TIMES (48000000 / (CH_CFG_ST_FREQUENCY) / (CYCLES_PER_LOOP))
+
+void chThdSleep(sysinterval_t time) {
+    uint32_t loops = time * LOOP_TIMES;
+
+    for (uint32_t i = 0; i < loops; i++) __NOP();
+}
+
+/* suspend thread used in usb_main.c */
+msg_t chThdSuspendTimeoutS(thread_reference_t* trp, sysinterval_t timeout) {
+    osalSysUnlock();
+    osalSysLock();
+
+    return MSG_OK;
+}
+
+#endif /* CH_CFG_NO_IDLE_THREAD */
+
 
 #ifdef RGB_MATRIX_ENABLE
 

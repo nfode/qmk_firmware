@@ -131,7 +131,7 @@
  *          infinite loop.
  */
 #    if !defined(CH_CFG_NO_IDLE_THREAD)
-#        define CH_CFG_NO_IDLE_THREAD FALSE
+#        define CH_CFG_NO_IDLE_THREAD TRUE
 #    endif
 
 /** @} */
@@ -694,6 +694,16 @@
 /*===========================================================================*/
 /* Port-specific settings (override port settings defaulted in chcore.h).    */
 /*===========================================================================*/
+#define PORT_IDLE_THREAD_STACK_SIZE    0
+#define PORT_INT_REQUIRED_STACK        0
+#define RAW_IN_CAPACITY                1
+#define RAW_OUT_CAPACITY               1
+
+/* can't call sleep without the idle thread, must override related functions */
+#if CH_CFG_NO_IDLE_THREAD == TRUE
+        #pragma weak chThdSleep
+        #pragma weak chThdSuspendTimeoutS
+#endif
 
 #endif /* CHCONF_H */
 
