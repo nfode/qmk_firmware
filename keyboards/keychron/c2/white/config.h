@@ -62,7 +62,6 @@
 #define LED_CAPS_LOCK_PIN   D6
 #define LED_MAC_PIN         B5
 #define LED_WIN_PIN         B4
-#define LED_SCROLL_LOCK_PIN LED_MAC_PIN
 #define LED_PIN_ON_STATE    1
 
 #define DYNAMIC_KEYMAP_LAYER_COUNT 4
