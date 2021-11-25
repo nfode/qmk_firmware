@@ -1,6 +1,5 @@
 # project specific files
-SRC = matrix.c
-SRC += rand.c
+SRC = rand.c
 
 ## chip/board settings
 # - the next two should match the directories in
@@ -44,7 +43,7 @@ NKRO_ENABLE = yes       	# USB Nkey Rollover
 DIP_SWITCH_ENABLE = yes
 
 # Custom Key and LED matrix handling
-CUSTOM_MATRIX = yes
+CUSTOM_MATRIX = no
 RGB_MATRIX_ENABLE = no
 
 # Some options to reduce RAM usage
