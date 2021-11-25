@@ -24,11 +24,11 @@
 #define DEVICE_VER 0x0001
 
 #define MANUFACTURER Keychron
-#define PRODUCT      \x43\x32
+#define PRODUCT      \x43\x32 White
 #define DESCRIPTION  \x43\x32 White QMK
 
 #define WAIT_FOR_USB
-#define USB_MAX_POWER_CONSUMPTION   100
+#define USB_MAX_POWER_CONSUMPTION 100
 
 /* key matrix size */
 #define MATRIX_ROWS 6
@@ -52,7 +52,7 @@
 #define RGB_DISABLE_WHEN_USB_SUSPENDED true
 
 /* Connects each switch in the dip switch to the GPIO pin of the MCU */
-#define DIP_SWITCH_PINS             { B3 }
+#define DIP_SWITCH_PINS { B3 }
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
 #define DEBOUNCE 0
@@ -64,7 +64,7 @@
 #define LED_WIN_PIN         B4
 #define LED_PIN_ON_STATE    1
 
-#define DYNAMIC_KEYMAP_LAYER_COUNT 4
+#define DYNAMIC_KEYMAP_LAYER_COUNT     4
 #define DYNAMIC_KEYMAP_EEPROM_MAX_ADDR 1200
 
 /* Disable the following animation because they are not interesting in monochrome */

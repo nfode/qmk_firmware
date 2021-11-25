@@ -15,8 +15,6 @@
  */
 #include "white.h"
 
-#include "quantum.h"
-
 // Manage Windows and Mac LEDs
 // - Show status of mode switch
 // - Turn LEDs off durring USB suspend
