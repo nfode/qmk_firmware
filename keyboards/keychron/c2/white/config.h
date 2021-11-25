@@ -65,6 +65,9 @@
 #define LED_SCROLL_LOCK_PIN LED_MAC_PIN
 #define LED_PIN_ON_STATE    1
 
+#define DYNAMIC_KEYMAP_LAYER_COUNT 4
+#define DYNAMIC_KEYMAP_EEPROM_MAX_ADDR 1200
+
 /* Disable the following animation because they are not interesting in monochrome */
 #define DISABLE_RGB_MATRIX_ALPHAS_MODS
 #define DISABLE_RGB_MATRIX_GRADIENT_UP_DOWN
