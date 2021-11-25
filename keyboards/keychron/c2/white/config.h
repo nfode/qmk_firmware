@@ -45,7 +45,7 @@
 #define LED_MATRIX_ROW_PINS     { C0, C1, C2, D4, C9, C10 }
 #define LED_MATRIX_COLS         MATRIX_COLS
 #define LED_MATRIX_COL_PINS     MATRIX_COL_PINS
-#define DRIVER_LED_TOTAL        126
+#define DRIVER_LED_TOTAL        104
 
 /* Backlight configuration */
 #define RGB_MATRIX_VAL_STEP            32
