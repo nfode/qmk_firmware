@@ -60,5 +60,8 @@
 /* Enable NKRO by default */ 
 #define FORCE_NKRO
 
+#define DYNAMIC_KEYMAP_LAYER_COUNT     4
+#define DYNAMIC_KEYMAP_EEPROM_MAX_ADDR 1000
+
 /* Polling Rate */
 #define USB_POLLING_INTERVAL_MS 1
