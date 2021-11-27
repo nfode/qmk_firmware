@@ -1,7 +1,4 @@
 # project specific files
-SRC = matrix.c
-SRC += rand.c
-
 ## chip/board settings
 # - the next two should match the directories in
 #   <chibios>/os/hal/ports/$(MCU_FAMILY)/$(MCU_SERIES)
@@ -38,17 +35,11 @@ OPT_DEFS = -Os
 #
 #MAGIC_ENABLE = yes
 #MAGIC_KEYCODE_ENABLE = yes
-#BOOTMAGIC_ENABLE = yes 	# Virtual DIP switch configuration
+BOOTMAGIC_ENABLE = full 	# Virtual DIP switch configuration
 #EXTRAKEY_ENABLE = yes   	# Audio control and System control
 #NKRO_ENABLE = yes       	# USB Nkey Rollover
 #DIP_SWITCH_ENABLE = no
 CONSOLE_ENABLE = yes
-
-# Custom Key and LED matrix handling
-CUSTOM_MATRIX = yes
-RGB_MATRIX_ENABLE = yes
-RGB_MATRIX_DRIVER = custom
-RGB_MATRIX_CUSTOM_KB = yes
 
 # Some options to reduce RAM usage
 LDFLAGS += --specs=nano.specs

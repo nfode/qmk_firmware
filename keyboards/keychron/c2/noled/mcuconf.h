@@ -52,13 +52,19 @@
 #define CRT1_AREAS_NUMBER 1
 #define PLATFORM_USB_USE_USB1 TRUE
 
-/*
- * Timer driver system settings.
- */
+// /*
+//  * Timer driver system settings.
+//  */
 #define SYS_CLOCK_SETUP 1
 #define SYS0_CLKCFG_VAL 0
 #define AHB_PRESCALAR 0
 #define CLKOUT_SEL_VAL 0x0
 #define CLKOUT_PRESCALAR 0x0
+
+/*----------------------------------------------------------------------------
+  DEFINES
+ *----------------------------------------------------------------------------*/
+#define IHRC48 0
+#define ILRC 1
 
 #endif /* MCUCONF_H */
