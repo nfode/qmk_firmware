@@ -31,24 +31,25 @@
 #define USB_MAX_POWER_CONSUMPTION 100
 
 /* key matrix size */
-#define MATRIX_ROWS 6
-#define MATRIX_COLS 21
+#define MATRIX_ROWS 5
+#define MATRIX_COLS 14
 
 #define DIODE_DIRECTION ROW2COL
-#define MATRIX_COL_PINS { A7, A8, A9, A10, A11, A12, A13, A14, A15, D0, D1, D2, D3, D8, A6, A5, A4, A3, A2, A1, A0 }
-#define MATRIX_ROW_PINS { C3, C4, C5, C6, C7, C8 }
+#define MATRIX_COL_PINS { A7, A8, A9, A10, A11, A12, A13, A14, A15, D0, D1, D2, D3, D8}
+#define MATRIX_ROW_PINS { C4, C5, C6, C7, C8}
+
 
 /* LED matrix */
 #define LED_MATRIX_ROWS         MATRIX_ROWS
 #define LED_MATRIX_ROW_CHANNELS 1
 #define LED_MATRIX_ROWS_HW      (LED_MATRIX_ROWS * LED_MATRIX_ROW_CHANNELS)
-#define LED_MATRIX_ROW_PINS     { C0, C1, C2, D4, C9, C10 }
+#define LED_MATRIX_ROW_PINS     { C1, C2, D4, C9, C10 }
 #define LED_MATRIX_COLS         MATRIX_COLS
 #define LED_MATRIX_COL_PINS     MATRIX_COL_PINS
-#define DRIVER_LED_TOTAL        104
+#define DRIVER_LED_TOTAL        64
 
 /* Backlight configuration */
-#define RGB_MATRIX_VAL_STEP            32
+#define RGB_MATRIX_VAL_STEP            4
 #define RGB_DISABLE_WHEN_USB_SUSPENDED true
 
 /* Connects each switch in the dip switch to the GPIO pin of the MCU */
@@ -58,11 +59,8 @@
 #define DEBOUNCE 0
 
 /* LED Status indicators */
-#define LED_NUM_LOCK_PIN    D7
 #define LED_CAPS_LOCK_PIN   D6
-#define LED_MAC_PIN         B5
-#define LED_WIN_PIN         B4
-#define LED_PIN_ON_STATE    1
+#define LED_PIN_ON_STATE   0
 
 #define DYNAMIC_KEYMAP_LAYER_COUNT     4
 #define DYNAMIC_KEYMAP_EEPROM_MAX_ADDR 1200
